@@ -17,9 +17,9 @@ router.post('/', requireAuthentication, async function (req, res, next) {
   console.log("== req.user:", req.user)
 
   const getUser = await getUserById(req.user)
-  console.log("==getUser admin:", getUser.admin)
+  console.log("==getUser admin:", getUser.role)
 
-  if(req.body.admin == true && getUser.admin != true){
+  if(req.body.role == "instructor" && getUser.role != "instructor"){
     next()
   } else {
     try {
@@ -38,6 +38,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
 router.post('/login', async function (req, res) {
   if (req.body && req.body.email && req.body.password) {
     const user = await getUserByEmail(req.body.email, true)
+    console.log("===user: ", user)
     const authenticated = user && await bcrypt.compare(
       req.body.password,
       user.password
@@ -89,77 +90,6 @@ router.get('/:id', requireAuthentication, async function (req, res, next) {
       console.log("below")
       next()
     }
-  }
-})
-
-module.exports = router
-/*
- * Route to list all of a user's businesses.
- */
-router.get('/:userId/businesses', requireAuthentication, async function (req, res, next) {
-  console.log("== req.user:", req.user)
-
-  const getUser = await getUserById(req.user)
-  console.log("== getUser:", getUser.admin)
-
-  if ( (req.user != req.params.userId) && (getUser.admin == false) ) {
-    // res.status(403).send({
-    //     err: "Unauthorized to access the specified resource"
-    // })
-    next()
-  } else {
-    const userId = req.params.userId
-    const userBusinesses = await Business.findAll({ where: { ownerId: userId } })
-    res.status(200).json({
-      businesses: userBusinesses
-    })
-  }
-})
-
-/*
- * Route to list all of a user's reviews.
- */
-router.get('/:userId/reviews', requireAuthentication, async function (req, res, next) {
-  console.log("== req.user:", req.user)
-
-  const getUser = await getUserById(req.user)
-  console.log("== getUser:", getUser.admin)
-
-  if ( (req.user != req.params.userId) && (getUser.admin == false) ) {
-    // res.status(403).send({
-    //     err: "Unauthorized to access the specified resource"
-    // })
-    next()
-  } else {
-    const userId = req.params.userId
-    const userReviews = await Review.findAll({ where: { userId: userId } })
-    res.status(200).json({
-      reviews: userReviews
-    })
-  }
-})
-
-
-/*
- * Route to list all of a user's photos.
- */
-router.get('/:userId/photos', requireAuthentication, async function (req, res, next) {
-  console.log("== req.user:", req.user)
-  
-  const getUser = await getUserById(req.user)
-  console.log("== getUser:", getUser.admin)
-
-  if ( (req.user != req.params.userId) && (getUser.admin == false) ) {
-    // res.status(403).send({
-    //     err: "Unauthorized to access the specified resource"
-    // })
-    next()
-  } else {
-    const userId = req.params.userId
-    const userPhotos = await Photo.findAll({ where: { userId: userId } })
-    res.status(200).json({
-      photos: userPhotos
-    })
   }
 })
 
