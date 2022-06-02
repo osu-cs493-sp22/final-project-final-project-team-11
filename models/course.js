@@ -19,3 +19,15 @@ exports.CourseClientField = [
   'instructor'
 ]
 
+
+exports.insertNewCourse = async function (course) {
+  const result = await Course.create(course, exports.CourseClientField)
+  return result.id
+}
+
+
+exports.getCourseById = async function (id) {
+  const course = await Course.findByPk(id)
+  //console.log(course);
+  return course
+}
