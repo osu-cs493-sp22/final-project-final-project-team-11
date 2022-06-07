@@ -5,7 +5,7 @@ const { ValidationError, Op } = require('sequelize')
 const router = Router()
 
 const { validateAgainstSchema } = require('../lib/validation')
-const { Course, insertNewCourse, getCourseById } = require('../models/course')
+const { Course, CourseClientField, insertNewCourse, getCourseById } = require('../models/course')
 const { getUserById } = require('../models/user')
 const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
@@ -80,10 +80,17 @@ router.get('/', async function (req, res, next) {
 router.get('/:courseid', async function (req, res, next) {
   console.log("Get the class details excluding students and assignments")
   const courseid = req.params.courseid
+
   try {
     const course = await getCourseById(courseid)
+    const user = await getUserById(course.instructor)
     if (course) {
-      res.status(201).send({ crs: course })
+      res.status(201).send({ 
+        course: {
+          info: course,
+          instructor: user
+        }
+      })
     } else {
       res.status(404).send({err: "course does not exist"})
     }
@@ -96,9 +103,39 @@ router.get('/:courseid', async function (req, res, next) {
   }
 })
 
-router.patch('/:courseid', async function (req, res, next) {
-  console.log("modify a course information")
-  res.status(200).send({mess: "modify a course information"})
+/*
+ * Route to update data for a course.
+ */
+router.patch('/:courseid', requireAuthentication, async function (req, res, next) {
+  console.log("== req.user:", req.user)
+  const courseid = req.params.courseid
+
+  const user = await getUserById(req.user)
+  const exCourse = await getCourseById(courseid)
+  console.log("==getCourse:", exCourse)
+  console.log("==user:", req.user)
+
+  if (user.role == "admin" || (user.role == "instructor" && exCourse.instructor == req.user)) {
+    try {
+      const result = await Course.update(req.body, {
+        where: { id: courseid },
+        fields: CourseClientField
+      })
+      if (result[0] > 0) {
+        res.status(204).send()
+      } else {
+        next()
+      }
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        res.status(400).send({ error: e.errors })
+      } else {
+          throw e
+      }
+    }
+  } else {
+    res.status(400).send({ error: "You do not have the permissions to edit this course"})
+  }
 })
 
 router.delete('/:courseid', async function (req, res, next) {
