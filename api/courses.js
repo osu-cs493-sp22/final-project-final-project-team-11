@@ -11,7 +11,7 @@ const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
 router.post('/', requireAuthentication, async function (req, res, next) {
   const usr = await getUserById(req.user)
-  console.log("role: ", usr.role)
+  //console.log("role: ", usr.role)
 
   if(usr.role == "admin") {
     try {
@@ -74,11 +74,11 @@ router.get('/', async function (req, res, next) {
     totalCount: result.count,
     links: links
   })
-  console.log("Get all the courses - exlude the sutdent and assignment list")
+  //console.log("Get all the courses - exlude the sutdent and assignment list")
 })
 
 router.get('/:courseid', async function (req, res, next) {
-  console.log("Get the class details excluding students and assignments")
+  //console.log("Get the class details excluding students and assignments")
   const courseid = req.params.courseid
 
   try {
@@ -107,13 +107,13 @@ router.get('/:courseid', async function (req, res, next) {
  * Route to update data for a course.
  */
 router.patch('/:courseid', requireAuthentication, async function (req, res, next) {
-  console.log("== req.user:", req.user)
+  //console.log("== req.user:", req.user)
   const courseid = req.params.courseid
 
   const user = await getUserById(req.user)
   const exCourse = await getCourseById(courseid)
-  console.log("==getCourse:", exCourse)
-  console.log("==user:", req.user)
+  //console.log("==getCourse:", exCourse)
+  //console.log("==user:", req.user)
 
   if (user.role == "admin" || (user.role == "instructor" && exCourse.instructor == req.user)) {
     try {
@@ -139,7 +139,7 @@ router.patch('/:courseid', requireAuthentication, async function (req, res, next
 })
 
 router.delete('/:courseid', async function (req, res, next) {
-  console.log("delete a course")
+  //console.log("delete a course")
   const courseid = req.params.courseid
   const result = await Course.destroy({ where: { id: courseid } })
   if (result > 0) {
