@@ -1,8 +1,5 @@
 const { Router } = require('express')
 
-//const { Business } = require('../models/business')
-//const { Photo } = require('../models/photo')
-//const { Review } = require('../models/review')
 const { ValidationError } = require('sequelize')
 
 const router = Router()

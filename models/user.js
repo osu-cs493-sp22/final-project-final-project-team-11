@@ -36,7 +36,7 @@ exports.getUserById = async function (id, includePassword) {
   if(!includePassword){
     user.password = 0;
   }
-  console.log(user);
+  //console.log(user);
    return user
 }
 

@@ -2,7 +2,7 @@ const { Router } = require('express')
 const { ValidationError } = require('sequelize')
 
 const { Assignment, AssignmentClientFields } = require('../models/assignment')
-const { Submission } = require('../models/submission')
+const { Submission, SubmissionClientField, insertNewSubmission } = require('../models/submission')
 const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
 const router = Router()
@@ -75,4 +75,19 @@ router.delete('/:assignmentId', async function (req, res, next) {
   }
 })
 
+/*
+* Create Submission
+*/
+router.post('/:id/submissions', async function (req,res,next){
+  try {
+    const submission = await Submission.create(req.body, SubmissionClientField)
+    res.status(201).send({ id: submission.id })
+  } catch (e) {
+    if (e instanceof ValidationError) {
+      res.status(400).send({ error: e.message })
+    } else {
+      throw e
+    }
+  }
+})
 module.exports = router

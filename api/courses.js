@@ -22,6 +22,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
         res.status(201).send({ id: courseid })
       } catch (e) {
         if (e instanceof ValidationError) {
+          console.log(e);
           res.status(400).send({ error: "Invalid request body supplied" })
         } else {
             throw e
@@ -86,14 +87,8 @@ router.get('/:courseid', async function (req, res, next) {
 
   try {
     const course = await getCourseById(courseid)
-    const user = await getUserById(course.instructor)
     if (course) {
-      res.status(201).send({ 
-        course: {
-          info: course,
-          instructor: user
-        }
-      })
+      res.status(201).send( course)
     } else {
       res.status(404).send({err: "course does not exist"})
     }

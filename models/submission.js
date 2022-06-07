@@ -18,3 +18,11 @@ exports.SubmissionClientField = [
   'grade',
   'file'
 ]
+
+exports.insertNewSubmission = async function (submission) {
+  if(submission.grade){
+    delete submission.grade
+  }
+  const result = await Submission.create(submission, exports.SubmissionClientField)
+  return result.id
+}
