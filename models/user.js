@@ -17,7 +17,8 @@ exports.UserClientFields = [
   'name',
   'email',
   'password',
-  'role'
+  'role',
+  'courseId'
 ]
 
 exports.insertNewUser = async function (user) {

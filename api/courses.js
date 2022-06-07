@@ -6,7 +6,7 @@ const router = Router()
 
 const { validateAgainstSchema } = require('../lib/validation')
 const { Course, CourseClientField, insertNewCourse, getCourseById } = require('../models/course')
-const { getUserById } = require('../models/user')
+const { getUserById, UserSchema } = require('../models/user')
 const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
 /*
@@ -16,7 +16,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
   const usr = await getUserById(req.user)
   //console.log("role: ", usr.role)
 
-  if(usr.role == "admin") {
+  if(usr.role == "instructor") {
     try {
         const courseid = await insertNewCourse(req.body)
         res.status(201).send({ id: courseid })
@@ -142,6 +142,63 @@ router.delete('/:courseid', async function (req, res, next) {
   const result = await Course.destroy({ where: { id: courseid } })
   if (result > 0) {
     res.status(204).send()
+  } else {
+    next()
+  }
+})
+
+/*
+* Enroll student
+*/
+router.post('/:courseid/students', requireAuthentication, async function (req, res, next) {
+  const user = await getUserById(req.user)
+  const getCourse = await getCourseById(req.params.courseid)
+
+  if ( user.role == "admin" || (user.role == "instructor" && getCourse.instructor == req.user) ) {
+    try {
+      if(req.body.add.length > 0){
+        for(let i = 0; i < req.body.add.length; i++){
+          let currUser = await getUserById(req.body.add[i])
+  
+          await getCourse.addUser(currUser)
+        }
+      }
+      if(req.body.remove.length > 0){
+        for(let i = 0; i < req.body.remove.length; i++){
+          let currUser = await getUserById(req.body.remove[i])
+  
+          await getCourse.removeUser(currUser)
+        }
+      }
+      res.status(200).send(req.body)
+    } catch (e) {
+      if (e instanceof ValidationError) {
+        res.status(400).send({ error: e.message })
+      } else {
+        throw e
+      }
+    }
+  }
+})
+
+/*
+* List students enrolled in course
+*/
+router.get('/:courseid/students', async function (req, res, next) {
+  const courseid = req.params.courseid
+  const result = await Course.findOne({
+   where: { id: courseid},
+   include: UserSchema 
+  })
+
+  const enrolled = []
+
+  for(let i = 0; i < result.users.length; i++){
+    enrolled[i] = result.users[i].dataValues.name
+  }
+
+  if (enrolled) {
+    res.status(200).send(enrolled)
   } else {
     next()
   }

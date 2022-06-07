@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize')
+const { UserSchema } = require("./user")
 
 const sequelize = require('../lib/sequelize')
 
@@ -19,6 +20,8 @@ exports.CourseClientField = [
   'instructor'
 ]
 
+Course.belongsToMany(UserSchema, {through: 'Enrollment'})
+UserSchema.belongsToMany(Course, {through: 'Enrollment'})
 
 exports.insertNewCourse = async function (course) {
   const result = await Course.create(course, exports.CourseClientField)
