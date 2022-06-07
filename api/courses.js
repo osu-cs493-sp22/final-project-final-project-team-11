@@ -9,6 +9,9 @@ const { Course, CourseClientField, insertNewCourse, getCourseById } = require('.
 const { getUserById } = require('../models/user')
 const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
+/*
+  API endpoint for adding a new course
+*/
 router.post('/', requireAuthentication, async function (req, res, next) {
   const usr = await getUserById(req.user)
   //console.log("role: ", usr.role)
@@ -19,7 +22,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
         res.status(201).send({ id: courseid })
       } catch (e) {
         if (e instanceof ValidationError) {
-          res.status(400).send({ error: e.errors })
+          res.status(400).send({ error: "Invalid request body supplied" })
         } else {
             throw e
         }
@@ -128,7 +131,7 @@ router.patch('/:courseid', requireAuthentication, async function (req, res, next
       }
     } catch (e) {
       if (e instanceof ValidationError) {
-        res.status(400).send({ error: e.errors })
+        res.status(400).send({ error: "Invalid request body supplied" })
       } else {
           throw e
       }

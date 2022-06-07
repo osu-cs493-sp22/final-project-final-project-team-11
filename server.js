@@ -44,13 +44,21 @@ async function rateLimit(req, res, next) {
       last: Date.now()
     }
   }
+  //console.log("==tokenBucket:", tokenBucket)
+  // if (!!tokenBucket.tokens == false) {
+  //   tokenBucket.tokens = rateLimitMaxReq
+  // } 
 
   const now = Date.now()
   const ellapsed = now - tokenBucket.last
   tokenBucket.tokens += ellapsed * (rateLimitMaxReq / rateLimitWindowMs)
   tokenBucket.tokens = Math.min(rateLimitMaxReq, tokenBucket.tokens)
   tokenBucket.last = now
-  console.log("==tokenBucket:", tokenBucket)
+
+  if (!!tokenBucket.tokens == false) {
+    tokenBucket.tokens = rateLimitMaxReq
+  }
+  //console.log("==tokenBucket:", tokenBucket)
 
 
   if (tokenBucket.tokens >= 1) {
