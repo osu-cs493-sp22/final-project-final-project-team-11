@@ -83,6 +83,6 @@
     "name": "admin",
     "email": "admin@gmail.com",
     "password": "$2a$08$Y00/JO/uN9n0dHKuudRX2eKksWMIHXDLzHWKuz/K67alAYsZRRike",
-    "role": "instructor"
+    "role": "admin"
   }
 ]
