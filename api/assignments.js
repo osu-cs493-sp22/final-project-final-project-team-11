@@ -39,7 +39,7 @@ router.get('/', async function (req, res) {
   })
 })
 
-router.post('/', async function (req, res, next) {
+router.post('/', requireAuthentication, async function (req, res, next) {
   try {
     const assignment = await Assignment.create(req.body, AssignmentClientFields)
     res.status(201).send({ id: assignment.id })
@@ -52,7 +52,7 @@ router.post('/', async function (req, res, next) {
   }
 })
 
-router.get('/:assignmentId', async function (req, res, next) {
+router.get('/:assignmentId', requireAuthentication, async function (req, res, next) {
   const assignmentId = req.params.assignmentId
     const assignment = await Assignment.findByPk(assignmentId, {
       //include: [ Submission ]
@@ -65,10 +65,23 @@ router.get('/:assignmentId', async function (req, res, next) {
 
 })
 
-router.delete('/:assignmentId', async function (req, res, next) {
+router.delete('/:assignmentId', requireAuthentication, async function (req, res, next) {
   const assignmentId = req.params.assignmentId
   const result = await Assignment.destroy({ where: { id: assignmentId }})
   if (result > 0) {
+    res.status(204).send()
+  } else {
+    next()
+  }
+})
+
+router.patch('/:assignmentId', requireAuthentication, async function (req, res, next) {
+  const assignmentId = req.params.assignmentId
+  const result = await Assignment.update(req.body, {
+    where: { id: assignmentId },
+    fields: AssignmentClientFields
+  })
+  if (result[0] > 0) {
     res.status(204).send()
   } else {
     next()
