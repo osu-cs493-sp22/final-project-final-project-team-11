@@ -34,7 +34,7 @@ exports.insertNewUser = async function (user) {
 */
 exports.getUserById = async function (id, includePassword) {
   const user = await UserSchema.findByPk(id)
-  if(!includePassword){
+  if(!includePassword && user){
     user.password = 0;
   }
   //console.log(user);
