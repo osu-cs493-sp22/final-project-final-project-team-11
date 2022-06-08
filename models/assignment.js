@@ -17,3 +17,8 @@ exports.AssignmentClientFields = [
   'points',
   'due'
 ]
+
+exports.getAssignmentById = async function (id) {
+  const assignment = await Assignment.findByPk(id)
+   return assignment
+}
