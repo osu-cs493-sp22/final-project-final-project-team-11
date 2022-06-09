@@ -21,7 +21,7 @@ router.post('/', requireAuthentication, async function (req, res, next) {
   const usr = await getUserById(req.user)
   //console.log("role: ", usr.role)
 
-  if (usr.role == "instructor") {
+  if (usr.role == "admin") {
     try {
       const courseid = await insertNewCourse(req.body)
       res.status(201).send({ id: courseid })
@@ -38,6 +38,9 @@ router.post('/', requireAuthentication, async function (req, res, next) {
   }
 })
 
+/*
+  API endpoint for getting a list of courses
+*/
 router.get('/', async function (req, res, next) {
   let subject = req.query.subject
   let number = req.query.number
@@ -86,6 +89,9 @@ router.get('/', async function (req, res, next) {
   //console.log("Get all the courses - exlude the sutdent and assignment list")
 })
 
+/*
+ * Route to get data for a specific course.
+ */
 router.get('/:courseid', async function (req, res, next) {
   //console.log("Get the class details excluding students and assignments")
   const courseid = req.params.courseid
@@ -141,6 +147,9 @@ router.patch('/:courseid', requireAuthentication, async function (req, res, next
   }
 })
 
+/*
+ * Route to delete a course.
+ */
 router.delete('/:courseid', async function (req, res, next) {
   //console.log("delete a course")
   const courseid = req.params.courseid
